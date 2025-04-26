@@ -78,6 +78,9 @@ return function (RouteBuilder $routes): void {
         $builder->fallbacks();
     });
 
+    $routes->connect('/checkin', ['controller' => 'Checkin', 'action' => 'index']);
+    $routes->connect('/checkin/saveCheckin', ['controller' => 'Checkin', 'action' => 'saveCheckin']);
+
     /*
      * If you need a different set of middleware or none at all,
      * open new scope and define routes there.
