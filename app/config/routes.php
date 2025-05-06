@@ -55,12 +55,12 @@ return function (RouteBuilder $routes): void {
          * its action called 'display', and we pass a param to select the view file
          * to use (in this case, templates/Pages/home.php)...
          */
-        $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+        // $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
 
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
-        $builder->connect('/pages/*', 'Pages::display');
+        // $builder->connect('/pages/*', 'Pages::display');
 
         /*
          * Connect catchall routes for all controllers.
@@ -79,7 +79,8 @@ return function (RouteBuilder $routes): void {
     });
 
     $routes->connect('/checkin', ['controller' => 'Checkin', 'action' => 'index']);
-    $routes->connect('/checkin/saveCheckin', ['controller' => 'Checkin', 'action' => 'saveCheckin']);
+    $routes->connect('/authorize', ['controller' => 'Api', 'action' => 'authorize']);
+    $routes->connect('/saveCheckin', ['controller' => 'Api', 'action' => 'saveCheckin', '_method' => 'POST']);
 
     /*
      * If you need a different set of middleware or none at all,
@@ -96,4 +97,5 @@ return function (RouteBuilder $routes): void {
      * });
      * ```
      */
+    $routes->connect('*', array('controller' => 'NotFound', 'action' => 'notFound'));
 };

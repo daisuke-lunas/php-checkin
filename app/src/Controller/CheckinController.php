@@ -2,62 +2,36 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-use Cake\Utility\Text; // UUID生成のため
-use SebastianBergmann\Environment\Console;
+use Cake\Http\Client;
 
 class CheckinController extends AppController
 {
-    public function initialize(): void
-    {
-        parent::initialize();
-        $this->loadComponent('RequestHandler');
-    }
+  public function index()
+  {
+      $session = $this->getRequest()->getSession();
+      $user = $session->read('User');
 
-    public function index()
-    {
-        $this->set('message', 'ログインしてください');
-    }
+      if ($user) {
+          // 認証済 → saveCheckin へ送信
+          $http = new Client();
+          $response = $http->post('https://'.env('MY_DOMAIN').'/saveCheckin', [
+              'id_token' => $session->read('IdToken')
+          ]);
+          $body = $response->getJson();
 
-    public function saveCheckin()
-    {
-        $this->request->allowMethod(['post']);
-        $data = $this->request->getData();
-
-        $username = $data['username'];
-        $this->log($username, 'debug');
-        $password = $data['password'];
-        $this->log($password, 'debug');
-
-        // ユーザー認証ロジック
-        $userTable = $this->fetchTable('Users');
-        $query = $userTable->find()
-            ->where(['username' => $username]);
-        // debug((string)$query->sql());
-        // debug($query->getValueBinder()->bindings());
-        $user = $query->first();
-
-        if ($user) { //&& password_verify($password, $user->password)
-            $checkin = $this->Checkin->newEmptyEntity();
-            $checkin->id = Text::uuid();
-            $checkin->customer_id = $user->id;
-            $checkin->customer_name = $user->display_name;
-            $checkin->type = 'in'; // 仮のタイプ。状況に応じて変更
-            $checkin->check_in_at = date('Y-m-d H:i:s');
-
-            if ($this->Checkin->save($checkin)) {
-                $response = [
-                    'auth' => 'OK',
-                    'display_name' => $user->display_name
-                ];
-            } else {
-                $response = ['auth' => 'NG'];
-            }
-        } else {
-            $response = ['auth' => 'NG'];
-        }
-
-        $this->set(compact('response'));
-        $this->viewBuilder()->setOption('serialize', 'response');
-        $this->viewBuilder()->setClassName('Json');
-    }
+          if ($response->isOk() && isset($body['userName'])) {
+              $this->set('message', "{$body['userName']}さん、いらっしゃいませ");
+          } else {
+              $this->set('message', "ログインエラー: " . $body['error']);
+          }
+      } else {
+          // LINEログインボタン表示
+          $lineClientId = env('LINE_CHANNEL_ID');
+          $redirectUri = urlencode('https://'.env('MY_DOMAIN').'/authorize');
+          $state = bin2hex(random_bytes(16));
+          $session->write('OAuthState', $state);
+          $lineLoginUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={$lineClientId}&redirect_uri={$redirectUri}&state={$state}&scope=openid%20profile";
+          $this->set('loginUrl', $lineLoginUrl);
+      }
+  }
 }
