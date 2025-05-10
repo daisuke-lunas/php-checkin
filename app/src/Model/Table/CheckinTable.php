@@ -40,6 +40,11 @@ class CheckinTable extends Table
         $this->setTable('checkin');
         $this->setDisplayField('customer_name');
         $this->setPrimaryKey('id');
+
+        $this->belongsTo('Users', [
+            'foreignKey' => 'user_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**
@@ -51,24 +56,30 @@ class CheckinTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->integer('customer_id')
-            ->requirePresence('customer_id', 'create')
-            ->notEmptyString('customer_id');
+            ->integer('user_id')
+            ->notEmptyString('user_id');
 
         $validator
-            ->scalar('customer_name')
-            ->maxLength('customer_name', 255)
-            ->requirePresence('customer_name', 'create')
-            ->notEmptyString('customer_name');
+            ->scalar('user_ext_id')
+            ->maxLength('user_ext_id', 255)
+            ->requirePresence('user_ext_id', 'create')
+            ->notEmptyString('user_ext_id');
 
         $validator
-            ->dateTime('created_at')
-            ->allowEmptyDateTime('created_at');
+            ->scalar('user_name')
+            ->maxLength('user_name', 255)
+            ->requirePresence('user_name', 'create')
+            ->notEmptyString('user_name');
 
         $validator
             ->scalar('type')
             ->requirePresence('type', 'create')
             ->notEmptyString('type');
+
+        $validator
+            ->dateTime('check_in_at')
+            ->requirePresence('check_in_at', 'create')
+            ->notEmptyDateTime('check_in_at');
 
         $validator
             ->scalar('item')
@@ -79,11 +90,20 @@ class CheckinTable extends Table
             ->scalar('details')
             ->allowEmptyString('details');
 
-        $validator
-            ->dateTime('check_in_at')
-            ->requirePresence('check_in_at', 'create')
-            ->notEmptyDateTime('check_in_at');
-
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
+
+        return $rules;
     }
 }

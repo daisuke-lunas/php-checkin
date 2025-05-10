@@ -10,7 +10,7 @@ class ApiController extends AppController
     {
         $code = $this->request->getQuery('code');
         $state = $this->request->getQuery('state');
-        $sessionState = $this->getRequest()->getSession()->read('OAuthState');
+        $sessionState = $this->request->getSession()->read('OAuthState');
 
         if ($state !== $sessionState) {
             throw new \Exception("Invalid state.");
@@ -40,18 +40,20 @@ class ApiController extends AppController
 
         // DBにユーザー登録
         $usersTable = $this->getTableLocator()->get('Users');
-        if (!$usersTable->exists(['line_id' => $userId])) {
+        if (!$usersTable->exists(['user_ext_id' => $userId])) {
             $user = $usersTable->newEntity([
-                'line_id' => $userId,
-                'name' => $userName
+                'ext_type' => "LINE",
+                'ext_id' => $userId,
+                'username' => $userName,
+                'display_name' => $userName
             ]);
             $usersTable->save($user);
         }
 
         // セッション保存
         $this->getRequest()->getSession()->write('User', [
-            'line_id' => $userId,
-            'name' => $userName
+            'ext_id' => $userId,
+            'username' => $userName
         ]);
 
         return $this->redirect('/checkin');
@@ -74,11 +76,11 @@ class ApiController extends AppController
         $userId = $payload['sub'];
 
         $usersTable = $this->getTableLocator()->get('Users');
-        $user = $usersTable->find()->where(['line_id' => $userId])->first();
+        $user = $usersTable->find()->where(['ext_id' => $userId])->first();
 
         if (!$user) {
             return $this->response->withType('application/json')->withStringBody(json_encode([
-                'error' => 'ログインしていません'
+                'error' => 'ユーザーが見つかりません'
             ]));
         }
 
@@ -86,12 +88,15 @@ class ApiController extends AppController
         $checkinsTable = $this->getTableLocator()->get('Checkins');
         $checkin = $checkinsTable->newEntity([
             'user_id' => $user->id,
+            'user_ext_id' => $user->ext_id,
+            'user_name' => $user->display_name,
+            'type' => 'in',
             'checked_in_at' => date('Y-m-d H:i:s')
         ]);
         $checkinsTable->save($checkin);
 
         return $this->response->withType('application/json')->withStringBody(json_encode([
-            'userName' => $user->name
+            'userName' => $user->display_name
         ]));
     }
 }

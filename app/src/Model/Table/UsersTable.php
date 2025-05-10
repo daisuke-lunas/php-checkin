@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
-use App\Model\Entity\User;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -41,6 +40,10 @@ class UsersTable extends Table
         $this->setTable('users');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
+
+        $this->hasMany('Checkin', [
+            'foreignKey' => 'user_id',
+        ]);
     }
 
     /**
@@ -52,16 +55,21 @@ class UsersTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
+            ->scalar('ext_type')
+            ->maxLength('ext_type', 12)
+            ->notEmptyString('ext_type');
+
+        $validator
+            ->scalar('ext_id')
+            ->maxLength('ext_id', 255)
+            ->requirePresence('ext_id', 'create')
+            ->notEmptyString('ext_id');
+
+        $validator
             ->scalar('username')
             ->maxLength('username', 255)
             ->requirePresence('username', 'create')
             ->notEmptyString('username');
-
-        $validator
-            ->scalar('password')
-            ->maxLength('password', 255)
-            ->requirePresence('password', 'create')
-            ->notEmptyString('password');
 
         $validator
             ->scalar('display_name')
@@ -84,12 +92,5 @@ class UsersTable extends Table
         $rules->add($rules->isUnique(['username']), ['errorField' => 'username']);
 
         return $rules;
-    }
-
-    public function findByUsername(string $username): ?User
-    {
-        return $this->find()
-            ->where(['username' => $username])
-            ->first();
     }
 }

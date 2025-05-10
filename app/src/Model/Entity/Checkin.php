@@ -9,13 +9,13 @@ use Cake\ORM\Entity;
  * Checkin Entity
  *
  * @property string $id
- * @property int $customer_id
- * @property string $customer_name
- * @property \Cake\I18n\FrozenTime|null $created_at
+ * @property int $user_id
+ * @property string $user_ext_id
+ * @property string $user_name
  * @property string $type
+ * @property \Cake\I18n\FrozenTime $check_in_at
  * @property string|null $item
  * @property string|null $details
- * @property \Cake\I18n\FrozenTime $check_in_at
  */
 class Checkin extends Entity
 {
@@ -29,12 +29,12 @@ class Checkin extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
-        'customer_id' => true,
-        'customer_name' => true,
-        'created_at' => true,
+        'user_id' => true,
+        'user_ext_id' => true,
+        'user_name' => true,
         'type' => true,
+        'check_in_at' => true,
         'item' => true,
         'details' => true,
-        'check_in_at' => true,
     ];
 }

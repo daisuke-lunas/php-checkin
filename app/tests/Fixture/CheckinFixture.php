@@ -25,14 +25,14 @@ class CheckinFixture extends TestFixture
     {
         $this->records = [
             [
-                'id' => '08f9dfbc-4f21-4cc8-b7bb-182d9e873b25',
-                'customer_id' => 1,
-                'customer_name' => 'Lorem ipsum dolor sit amet',
-                'created_at' => '2025-04-26 09:16:10',
+                'id' => '1380830f-4da8-48db-a942-522538d25bd2',
+                'user_id' => 1,
+                'user_ext_id' => 'Lorem ipsum dolor sit amet',
+                'user_name' => 'Lorem ipsum dolor sit amet',
                 'type' => 'Lorem ipsum dolor sit amet',
+                'check_in_at' => '2025-05-10 10:08:41',
                 'item' => 'Lorem ipsum dolor sit amet',
                 'details' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
-                'check_in_at' => '2025-04-26 09:16:10',
             ],
         ];
         parent::init();

@@ -20,9 +20,10 @@ class UsersFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
+                'ext_type' => '',
+                'ext_id' => 'Lorem ipsum dolor sit amet',
                 'username' => 'Lorem ipsum dolor sit amet',
-                'password' => 'Lorem ipsum dolor sit amet',
-                'name' => 'Lorem ipsum dolor sit amet',
+                'display_name' => 'Lorem ipsum dolor sit amet',
             ],
         ];
         parent::init();

@@ -9,9 +9,10 @@ use Cake\ORM\Entity;
  * User Entity
  *
  * @property int $id
+ * @property string $ext_type
+ * @property string $ext_id
  * @property string $username
- * @property string $password
- * @property string $name
+ * @property string $display_name
  */
 class User extends Entity
 {
@@ -25,17 +26,9 @@ class User extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
+        'ext_type' => true,
+        'ext_id' => true,
         'username' => true,
-        'password' => true,
-        'name' => true,
-    ];
-
-    /**
-     * Fields that are excluded from JSON versions of the entity.
-     *
-     * @var array<string>
-     */
-    protected $_hidden = [
-        'password',
+        'display_name' => true,
     ];
 }

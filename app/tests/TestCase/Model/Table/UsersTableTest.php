@@ -72,4 +72,15 @@ class UsersTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+
+    /**
+     * Test findByUsername method
+     *
+     * @return void
+     * @uses \App\Model\Table\UsersTable::findByUsername()
+     */
+    public function testFindByUsername(): void
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
 }
