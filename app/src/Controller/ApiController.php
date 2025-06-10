@@ -6,6 +6,7 @@ use Cake\Http\Client;
 
 class ApiController extends AppController
 {
+    // LINE コールバック 受け口API
     public function authorize()
     {
         $code = $this->request->getQuery('code');
@@ -28,6 +29,11 @@ class ApiController extends AppController
 
         $data = $response->getJson();
         $idToken = $data['id_token'] ?? null;
+
+        if(!$idToken) {
+          // キャンセルなどされたケース
+          return $this->redirect('/checkin');
+        }
 
         // IDトークンをセッションへ保存
         $this->getRequest()->getSession()->write('IdToken', $idToken);
