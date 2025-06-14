@@ -8,6 +8,10 @@ class CheckinController extends AppController
 {
   public function index()
   {
+      $error = $this->getRequest()->getQuery('error');
+      if ($error) {
+        $this->set('message', "ログイン中にエラーが発生し中断しました");
+      }
       $session = $this->getRequest()->getSession();
       $user = $session->read('User');
 

@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Http\Client;
+use Psr\Log\LogLevel;
 
 class ApiController extends AppController
 {
@@ -14,7 +15,13 @@ class ApiController extends AppController
         $sessionState = $this->request->getSession()->read('OAuthState');
 
         if ($state !== $sessionState) {
-            throw new \Exception("Invalid state.");
+            throw new \Exception("Invalid session state.");
+        }
+
+        // エラー判定
+        $errorCode = $this->request->getQuery('error');
+        if($errorCode) {
+            return $this->redirect('/checkin?error=1');
         }
 
         // トークン取得
@@ -25,13 +32,29 @@ class ApiController extends AppController
             'redirect_uri' => 'https://'.env('MY_DOMAIN').'/authorize',
             'client_id' => env('LINE_CHANNEL_ID'),
             'client_secret' => env('LINE_CHANNEL_SECRET')
-        ], ['type' => 'application/x-www-form-urlencoded']);
+        ], [
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ]
+        ]);
+
+        if($response->getStatusCode() !== 200) {
+          $this->log('LINE token response status is not 200: ' . $response->getStatusCode(), LogLevel::ERROR);
+          $this->log('LINE token response error: ' . $response->getStringBody(), LogLevel::ERROR);
+        }
 
         $data = $response->getJson();
+        if ($data === null) {
+            $this->log('LINE token response is not valid JSON: ' . $response->getStringBody(), LogLevel::ERROR);
+        } else {
+            $this->log('LINE token response: ' . json_encode($data), LogLevel::INFO);
+        }
         $idToken = $data['id_token'] ?? null;
 
         if(!$idToken) {
           // キャンセルなどされたケース
+          $this->log('idToken is null: '.$code, LogLevel::INFO);
           return $this->redirect('/checkin');
         }
 
