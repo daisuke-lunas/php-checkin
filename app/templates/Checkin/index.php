@@ -1,4 +1,4 @@
-<h1>Checkin system</h1>
+<h1>いらっしゃいませ！</h1>
 <?php if (isset($loginUrl)): ?>
     <a href="<?= h($loginUrl) ?>">
         <?= $this->Html->image('btn_login_base.png', ['alt' => 'LINEでログイン']) ?>

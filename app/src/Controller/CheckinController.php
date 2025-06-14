@@ -27,8 +27,18 @@ class CheckinController extends AppController
               $this->set('message', "{$body['userName']}さん、いらっしゃいませ");
               $this->set('showLogout', true);
           } else {
-              $this->set('message', "ログインエラー: "
-                . $response->getStatusCode());
+              $errorMsg = "";
+              $statusCode = $response->getStatusCode();
+              if ($statusCode !== 200) {
+                $errorMsg .= "ログインエラー: " . $statusCode;
+              }
+              if (!empty($body['error'])) {
+                  $errorMsg .= ' - ' . $body['error'];
+              }
+              if (!empty($body['details'])) {
+                  $errorMsg .= ' [' . json_encode($body['details'], JSON_UNESCAPED_UNICODE) . ']';
+              }
+              $this->set('message', $errorMsg);
           }
       } else {
           // LINEログインボタン表示

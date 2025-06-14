@@ -110,7 +110,21 @@ class ApiController extends AppController
                 'error' => 'ユーザーが見つかりません'
             ]));
         }
+        // 今日すでにチェックインしているか確認
+        $today = date('Y-m-d');
+        $existingCheckin = $this->getTableLocator()->get('Checkins')
+            ->find()
+            ->where([
+          'user_id' => $user->id,
+          'DATE(check_in_at) =' => $today
+            ])
+            ->first();
 
+        if ($existingCheckin) {
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+          'error' => $user->display_name . 'さんは、本日すでにログインしています'
+            ]));
+        }
         // チェックイン登録
         $checkinsTable = $this->getTableLocator()->get('Checkins');
         $checkin = $checkinsTable->newEntity([
