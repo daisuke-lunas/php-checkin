@@ -74,6 +74,10 @@ class Application extends BaseApplication
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
+        $csrf = new CsrfProtectionMiddleware([
+            'httponly' => true,
+        ]);
+
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response
@@ -97,9 +101,14 @@ class Application extends BaseApplication
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add(new CsrfProtectionMiddleware([
-                'httponly' => true,
-            ]));
+            ->add(function ($request, $handler) use ($csrf) {
+                $path = $request->getPath();
+                // /saveCheckin へのリクエストはCSRFチェックをスキップ
+                if (strpos($path, '/saveCheckin') === 0) {
+                    return $handler->handle($request);
+                }
+                return $csrf->process($request, $handler);
+            });
 
         return $middlewareQueue;
     }

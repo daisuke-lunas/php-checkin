@@ -17,16 +17,18 @@ class CheckinController extends AppController
 
       if ($user) {
           // 認証済 → saveCheckin へ送信
+          $id_token = $session->read('IdToken');
           $http = new Client();
           $response = $http->post('https://'.env('MY_DOMAIN').'/saveCheckin', [
-              'id_token' => $session->read('IdToken')
+              'id_token' => $id_token
           ]);
           $body = $response->getJson();
 
           if ($response->isOk() && isset($body['userName'])) {
               $this->set('message', "{$body['userName']}さん、いらっしゃいませ");
           } else {
-              $this->set('message', "ログインエラー: " . $body['error']);
+              $this->set('message', "ログインエラー: "
+                . $response->getStatusCode());
           }
       } else {
           // LINEログインボタン表示

@@ -47,8 +47,6 @@ class ApiController extends AppController
         $data = $response->getJson();
         if ($data === null) {
             $this->log('LINE token response is not valid JSON: ' . $response->getStringBody(), LogLevel::ERROR);
-        } else {
-            $this->log('LINE token response: ' . json_encode($data), LogLevel::INFO);
         }
         $idToken = $data['id_token'] ?? null;
 
@@ -69,7 +67,7 @@ class ApiController extends AppController
 
         // DBにユーザー登録
         $usersTable = $this->getTableLocator()->get('Users');
-        if (!$usersTable->exists(['user_ext_id' => $userId])) {
+        if (!$usersTable->exists(['ext_id' => $userId])) {
             $user = $usersTable->newEntity([
                 'ext_type' => "LINE",
                 'ext_id' => $userId,
@@ -127,5 +125,13 @@ class ApiController extends AppController
         return $this->response->withType('application/json')->withStringBody(json_encode([
             'userName' => $user->display_name
         ]));
+    }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        if ($this->components()->has('FormProtection')) {
+            $this->FormProtection->setConfig('unlockedActions', ['saveCheckin']);
+        }
     }
 }
