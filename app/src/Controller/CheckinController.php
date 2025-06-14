@@ -23,9 +23,9 @@ class CheckinController extends AppController
               'id_token' => $id_token
           ]);
           $body = $response->getJson();
-
           if ($response->isOk() && isset($body['userName'])) {
               $this->set('message', "{$body['userName']}さん、いらっしゃいませ");
+              $this->set('showLogout', true);
           } else {
               $this->set('message', "ログインエラー: "
                 . $response->getStatusCode());
@@ -39,5 +39,12 @@ class CheckinController extends AppController
           $lineLoginUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={$lineClientId}&redirect_uri={$redirectUri}&state={$state}&scope=openid%20profile";
           $this->set('loginUrl', $lineLoginUrl);
       }
+  }
+
+  public function logout()
+  {
+      $session = $this->getRequest()->getSession();
+      $session->destroy();
+      return $this->redirect('/checkin');
   }
 }

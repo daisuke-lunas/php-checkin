@@ -81,6 +81,7 @@ return function (RouteBuilder $routes): void {
     $routes->connect('/checkin', ['controller' => 'Checkin', 'action' => 'index']);
     $routes->connect('/authorize', ['controller' => 'Api', 'action' => 'authorize']);
     $routes->connect('/saveCheckin', ['controller' => 'Api', 'action' => 'saveCheckin', '_method' => 'POST']);
+    $routes->connect('/logout', ['controller' => 'Checkin', 'action' => 'logout', '_method' => 'POST']);
 
     /*
      * If you need a different set of middleware or none at all,

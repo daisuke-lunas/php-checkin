@@ -5,4 +5,9 @@
     </a>
 <?php else: ?>
     <h2><?= h($message) ?></h2>
+    <?php if (!empty($showLogout)): ?>
+        <form method="post" action="/logout">
+            <button type="submit">ログアウト</button>
+        </form>
+    <?php endif; ?>
 <?php endif; ?>
