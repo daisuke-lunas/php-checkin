@@ -118,9 +118,17 @@ class ApiController extends AppController
             'user_ext_id' => $user->ext_id,
             'user_name' => $user->display_name,
             'type' => 'in',
-            'checked_in_at' => date('Y-m-d H:i:s')
+            'check_in_at' => date('Y-m-d H:i:s')
         ]);
-        $checkinsTable->save($checkin);
+
+        if (!$checkinsTable->save($checkin)) {
+            $errors = $checkin->getErrors();
+            $this->log('Checkin save errors: ' . print_r($errors, true), LogLevel::ERROR);
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'error' => 'チェックインの保存に失敗しました',
+                'details' => $errors
+            ]));
+        }
 
         return $this->response->withType('application/json')->withStringBody(json_encode([
             'userName' => $user->display_name
