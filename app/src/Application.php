@@ -110,6 +110,9 @@ class Application extends BaseApplication
                 if (strpos($path, '/logout') === 0) {
                     return $handler->handle($request);
                 }
+                if (strpos($path, '/checkin-list') === 0) {
+                    return $handler->handle($request);
+                }
                 return $csrf->process($request, $handler);
             });
 
