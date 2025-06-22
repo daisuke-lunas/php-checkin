@@ -60,7 +60,7 @@ img {
     border: none;
     border-radius: 0;
     box-shadow: none;
-    margin: 0 auto 0 auto;
+    margin: 0 auto 8px auto;
     width: 100%;
     max-width: 320px;
 }
@@ -92,10 +92,13 @@ img {
 </style>
 <div class="container">
     <h1>いらっしゃいませ！</h1>
+    <h2><?= getenv('SERVICE_NAME') ?></h2>
+    <h2>下記サービスを利用してログインしてください</h2>
     <?php if (isset($loginUrl)): ?>
         <a href="<?= h($loginUrl) ?>" class="btn">
             <?= $this->Html->image('btn_login_base.png', ['alt' => 'LINEでログイン']) ?>
         </a>
+    <div>毎月のチェックイン回数に応じて、割引が適用されます（仮）</div>
     <?php else: ?>
         <h2><?= h($message) ?></h2>
         <h4><?= h($monthlyCountMessage) ?></h4>
