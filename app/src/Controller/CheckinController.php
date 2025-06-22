@@ -13,11 +13,13 @@ class CheckinController extends AppController
       $user = $session->read('User');
       if ($error) {
         $this->set('message', "ログイン中にエラーが発生し中断しました。お手数ですが、もう一度ログインをお願いします。");
+        $this->set('showLogout', true);
         $session->destroy();
         $user = null;
       }
 
       if ($user) {
+          $this->set('showLogout', true);
           // 認証済 → saveCheckin へ送信
           $id_token = $session->read('IdToken');
           $http = new Client();
@@ -27,7 +29,6 @@ class CheckinController extends AppController
           $body = $response->getJson();
           if ($response->isOk() && isset($body['userName'])) {
               $this->set('message', "{$body['userName']}さん、いらっしゃいませ");
-              $this->set('showLogout', true);
           } else {
               $errorMsg = "";
               $statusCode = $response->getStatusCode();
@@ -41,6 +42,9 @@ class CheckinController extends AppController
                   $errorMsg .= ' [' . json_encode($body['details'], JSON_UNESCAPED_UNICODE) . ']';
               }
               $this->set('message', $errorMsg);
+          }
+          if (isset($body['monthlyCount']) && (int)$body['monthlyCount'] >= 0) {
+              $this->set('monthlyCountMessage', "今月のご来店回数：" . (int)$body['monthlyCount'] . "回");
           }
       } else {
           // LINEログインボタン表示

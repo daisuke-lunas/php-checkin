@@ -5,6 +5,7 @@
     </a>
 <?php else: ?>
     <h2><?= h($message) ?></h2>
+    <h4><?= h($monthlyCountMessage) ?></h4>
     <?php if (!empty($showLogout)): ?>
         <form method="post" action="/logout">
             <button type="submit">ログアウト</button>

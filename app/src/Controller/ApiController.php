@@ -120,9 +120,20 @@ class ApiController extends AppController
             ])
             ->first();
 
+        // 今月のチェックイン数
+        $month = date('Y-m');
+        $monthlyCount = $this->getTableLocator()->get('Checkins')
+          ->find()
+          ->where([
+            'user_id' => $user->id,
+            'DATE_FORMAT(check_in_at, "%Y-%m") =' => $month
+          ])
+          ->count();
+
         if ($existingCheckin) {
             return $this->response->withType('application/json')->withStringBody(json_encode([
-          'error' => $user->display_name . 'さんは、本日すでにログインしています'
+          'error' => $user->display_name . 'さんは、本日すでにログインしています',
+          'monthlyCount' => $monthlyCount
             ]));
         }
         // チェックイン登録
@@ -145,7 +156,8 @@ class ApiController extends AppController
         }
 
         return $this->response->withType('application/json')->withStringBody(json_encode([
-            'userName' => $user->display_name
+            'userName' => $user->display_name,
+            'monthlyCount' => $monthlyCount
         ]));
     }
 
