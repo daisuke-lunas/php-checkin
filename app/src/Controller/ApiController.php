@@ -15,7 +15,7 @@ class ApiController extends AppController
         $sessionState = $this->request->getSession()->read('OAuthState');
 
         if ($state !== $sessionState) {
-            throw new \Exception("Invalid session state.");
+            return $this->redirect('/checkin?error=1');
         }
 
         // エラー判定
