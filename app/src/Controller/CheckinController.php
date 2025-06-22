@@ -10,11 +10,12 @@ class CheckinController extends AppController
   {
       $error = $this->getRequest()->getQuery('error');
       $session = $this->getRequest()->getSession();
+      $user = $session->read('User');
       if ($error) {
         $this->set('message', "ログイン中にエラーが発生し中断しました。お手数ですが、もう一度ログインをお願いします。");
         $session->destroy();
+        $user = null;
       }
-      $user = $session->read('User');
 
       if ($user) {
           // 認証済 → saveCheckin へ送信
