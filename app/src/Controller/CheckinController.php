@@ -46,6 +46,29 @@ class CheckinController extends AppController
           if (isset($body['monthlyCount']) && (int)$body['monthlyCount'] >= 0) {
               $this->set('monthlyCountMessage', "今月のご来店回数：" . (int)$body['monthlyCount'] . "回");
           }
+
+          // 先月の来店回数・割引表示
+          $userId = $user['ext_id'] ?? null;
+          if ($userId) {
+              $summaryTable = $this->getTableLocator()->get('CheckinUserMonthlySummary');
+              $lastMonth = date('Ym', strtotime('-1 month'));
+              $summary = $summaryTable->find()
+                  ->where([
+                      'yyyymm' => $lastMonth,
+                      'user_ext_id' => $userId,
+                      'type' => 'in',
+                  ])->first();
+              if ($summary) {
+                  $lastCount = (int)$summary->total_count;
+                  $msg = "先月のご来店回数：{$lastCount}回";
+                  if ($lastCount === 2) {
+                      $msg .= "<br>今月は100円引きです";
+                  } elseif ($lastCount === 5) {
+                      $msg .= "<br>今月は200円引きです";
+                  }
+                  $this->set('lastMonthMessage', $msg);
+              }
+          }
       } else {
           // LINEログインボタン表示
           $lineClientId = env('LINE_CHANNEL_ID');
