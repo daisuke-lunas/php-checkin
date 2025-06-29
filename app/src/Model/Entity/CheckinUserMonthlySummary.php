@@ -6,18 +6,18 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * User Entity
+ * CheckinUserMonthlySummary Entity
  *
- * @property int $id
- * @property string $ext_type
- * @property string $ext_id
- * @property string $username
- * @property string $display_name
- * @property string $user_type
+ * @property string $yyyymm
+ * @property int $user_id
+ * @property string $user_ext_id
+ * @property string $user_name
+ * @property string $type
+ * @property int $total_count
  *
- * @property \App\Model\Entity\Checkin[] $checkin
+ * @property \App\Model\Entity\User $user
  */
-class User extends Entity
+class CheckinUserMonthlySummary extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -29,11 +29,9 @@ class User extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
-        'ext_type' => true,
-        'ext_id' => true,
-        'username' => true,
-        'display_name' => true,
-        'user_type' => true,
-        'checkin' => true,
+        'user_ext_id' => true,
+        'user_name' => true,
+        'total_count' => true,
+        'user' => true,
     ];
 }

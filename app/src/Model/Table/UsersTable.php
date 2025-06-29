@@ -41,7 +41,7 @@ class UsersTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->hasMany('Checkin', [
+        $this->hasMany('Checkins', [
             'foreignKey' => 'user_id',
         ]);
     }
@@ -76,6 +76,11 @@ class UsersTable extends Table
             ->maxLength('display_name', 255)
             ->requirePresence('display_name', 'create')
             ->notEmptyString('display_name');
+
+        $validator
+            ->scalar('user_type')
+            ->maxLength('user_type', 10)
+            ->notEmptyString('user_type');
 
         return $validator;
     }

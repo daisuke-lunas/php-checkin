@@ -24,6 +24,7 @@ class UsersFixture extends TestFixture
                 'ext_id' => 'Lorem ipsum dolor sit amet',
                 'username' => 'Lorem ipsum dolor sit amet',
                 'display_name' => 'Lorem ipsum dolor sit amet',
+                'user_type' => '',
             ],
         ];
         parent::init();

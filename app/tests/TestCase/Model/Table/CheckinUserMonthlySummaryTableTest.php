@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\UsersTable;
+use App\Model\Table\CheckinUserMonthlySummaryTable;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\UsersTable Test Case
+ * App\Model\Table\CheckinUserMonthlySummaryTable Test Case
  */
-class UsersTableTest extends TestCase
+class CheckinUserMonthlySummaryTableTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \App\Model\Table\UsersTable
+     * @var \App\Model\Table\CheckinUserMonthlySummaryTable
      */
-    protected $Users;
+    protected $CheckinUserMonthlySummary;
 
     /**
      * Fixtures
@@ -24,8 +24,8 @@ class UsersTableTest extends TestCase
      * @var array<string>
      */
     protected $fixtures = [
+        'app.CheckinUserMonthlySummary',
         'app.Users',
-        'app.Checkin',
     ];
 
     /**
@@ -36,8 +36,8 @@ class UsersTableTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $config = $this->getTableLocator()->exists('Users') ? [] : ['className' => UsersTable::class];
-        $this->Users = $this->getTableLocator()->get('Users', $config);
+        $config = $this->getTableLocator()->exists('CheckinUserMonthlySummary') ? [] : ['className' => CheckinUserMonthlySummaryTable::class];
+        $this->CheckinUserMonthlySummary = $this->getTableLocator()->get('CheckinUserMonthlySummary', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class UsersTableTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->Users);
+        unset($this->CheckinUserMonthlySummary);
 
         parent::tearDown();
     }
@@ -56,7 +56,7 @@ class UsersTableTest extends TestCase
      * Test validationDefault method
      *
      * @return void
-     * @uses \App\Model\Table\UsersTable::validationDefault()
+     * @uses \App\Model\Table\CheckinUserMonthlySummaryTable::validationDefault()
      */
     public function testValidationDefault(): void
     {
@@ -67,7 +67,7 @@ class UsersTableTest extends TestCase
      * Test buildRules method
      *
      * @return void
-     * @uses \App\Model\Table\UsersTable::buildRules()
+     * @uses \App\Model\Table\CheckinUserMonthlySummaryTable::buildRules()
      */
     public function testBuildRules(): void
     {
