@@ -77,6 +77,12 @@
     <div id="stayInfoContent" style="font-size:1.2em; color:#333; min-height:4em;">
       ユーザーを選択してください。
     </div>
+    <div style="margin-top: 16px">
+      追加料金は5時間分で打ち止め。7時間が最大料金
+    </div>
+    <div>
+      ただし、550円以上お買い上げの場合、追加を1時間減らす。8時間で最大になる
+    </div>
     <div style="margin-top:1em; font-size:1.1em;">
       現在時刻: <span id="currentTime"></span>
     </div>
@@ -117,6 +123,7 @@ function showStayInfo(userName, checkinAt) {
     let price = 1320;
     let extraMins = 0;
     let overStr = '';
+    let maxStr = '';
     if (diffMins > 120) {
       const overMins = diffMins - 120;
       const overHours = Math.floor(overMins / 60);
@@ -130,8 +137,11 @@ function showStayInfo(userName, checkinAt) {
       price += Math.ceil(extraMinUnit) * 165;
     }
     // 7時間(420分)で打ち止め 2970円
-    if (diffMins >= 420) price = 2970;
+    if (diffMins >= 420) {
+      price = 2970;
+      maxStr = '<br><span style="color:red;font-size:0.95em;">※最大料金</span>';
+    }
     document.getElementById('stayInfoContent').innerHTML =
-        `<b>${userName}</b><br>滞在時間: <b>${stayStr}</b></br>料金: <b>￥${price.toLocaleString()}</b>`;
+        `<b>${userName}</b><br>滞在時間: <b>${stayStr}</b></br>料金: <b>￥${price.toLocaleString()}</b>${maxStr}`;
 }
 </script>
