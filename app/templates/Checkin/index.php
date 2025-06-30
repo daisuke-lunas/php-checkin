@@ -102,6 +102,15 @@ img {
     <?php else: ?>
         <h2><?= h($message) ?></h2>
         <h4><?= h($monthlyCountMessage) ?></h4>
+        <?php if (!empty($lastMonthMessage)): ?>
+            <div style="margin:0.5em 0; color:#2a7ae2; font-size:1em;">
+                <?= $lastMonthMessage ?>
+            </div>
+        <?php endif; ?>
+        <div style="margin:1.5em 0 1em 0;">
+            <span style="font-weight:bold; color:#e67e22; font-size:1.1em;">口コミを募集しています！こちらから投稿お願いします</span><br>
+            <a href=<?= getenv('WRITE_REVIEW_URL')?> target="_blank" rel="noopener" style="display:inline-block; margin-top:0.5em; padding:0.7em 1.5em; background:#2a7ae2; color:#fff; border-radius:6px; text-decoration:none; font-size:1em;">Google口コミを書く</a>
+        </div>
         <?php if (!empty($showLogout)): ?>
             <form method="post" action="/logout">
                 <button type="submit">ログアウト</button>
