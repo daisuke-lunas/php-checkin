@@ -61,11 +61,11 @@ class CheckinController extends AppController
               if ($summary) {
                   $lastCount = (int)$summary->total_count;
                   $msg = "先月のご来店回数：{$lastCount}回";
-                  if ($lastCount === 2) {
-                      $msg .= "<br>今月は100円引きです";
-                  } elseif ($lastCount === 5) {
+                  if ($lastCount >= 5) {
                       $msg .= "<br>今月は200円引きです";
-                  }
+                  } elseif ($lastCount >= 2) {
+                      $msg .= "<br>今月は100円引きです";
+                  } 
                   $this->set('lastMonthMessage', $msg);
               }
           }
