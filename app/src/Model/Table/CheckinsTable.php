@@ -37,6 +37,13 @@ class CheckinsTable extends Table
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
+        // CheckinUserMonthlySummary とのアソシエーション（1ユーザー複数月のサマリ）
+        $this->hasMany('CheckinUserMonthlySummary', [
+            'className' => 'CheckinUserMonthlySummary',
+            'foreignKey' => 'user_id',
+            'bindingKey' => 'user_id',
+            'joinType' => 'LEFT',
+        ]);
     }
 
     public function validationDefault(Validator $validator): Validator

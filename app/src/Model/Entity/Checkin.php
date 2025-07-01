@@ -36,5 +36,6 @@ class Checkin extends Entity
         'check_in_at' => true,
         'item' => true,
         'details' => true,
+        'checkin_user_monthly_summary' => true,
     ];
 }

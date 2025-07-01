@@ -9,12 +9,21 @@ class CheckinListController extends AppController
     public function index()
     {
         $today = date('Y-m-d');
+        $lastMonth = date('Ym', strtotime('-1 month'));
         $checkinsTable = $this->getTableLocator()->get('Checkins');
         $query = $checkinsTable->find()
-            ->where([
-                'DATE(check_in_at) =' => $today
+            ->contain([
+                'CheckinUserMonthlySummary' => function($q) use ($lastMonth) {
+                    return $q->where([
+                        'CheckinUserMonthlySummary.yyyymm' => $lastMonth,
+                        'CheckinUserMonthlySummary.type' => 'in',
+                    ]);
+                }
             ])
-            ->order(['check_in_at' => 'DESC']);
+            ->where([
+                'DATE(Checkins.check_in_at) =' => $today
+            ])
+            ->order(['Checkins.check_in_at' => 'DESC']);
         $checkins = $query->all();
         $this->set(compact('checkins', 'today'));
     }

@@ -60,13 +60,30 @@
             $dt = new DateTime($checkin->check_in_at, new DateTimeZone('UTC'));
             $dt->setTimezone(new DateTimeZone('Asia/Tokyo'));
             $jstTime = $dt->format('H:i');
+            // 割引メッセージをhasManyアソシエーションから「先月分」を探して生成
+            $lastMonth = date('Ym', strtotime('-1 month'));
+            $lastCount = 0;
+            if (!empty($checkin->checkin_user_monthly_summary)) {
+                foreach ($checkin->checkin_user_monthly_summary as $summary) {
+                    if ($summary->yyyymm == $lastMonth && $summary->type === 'in') {
+                        $lastCount = (int)($summary->total_count ?? 0);
+                        break;
+                    }
+                }
+            }
+            $discountMsg = '';
+            if ($lastCount >= 5) {
+                $discountMsg = '（先月' . $lastCount . '回: ここから200円割引）';
+            } elseif ($lastCount >= 2) {
+                $discountMsg = '（先月' . $lastCount . '回: ここから100円割引）';
+            }
         ?>
         <tr>
             <td><?= h($checkin->user_name) ?></td>
             <td><?= h($jstTime) ?></td>
             <td><?= h($checkin->type) ?></td>
             <td>
-                <button class="btn-calc" onclick="showStayInfo('<?= h($checkin->user_name) ?>', '<?= h($checkin->check_in_at) ?>')">料金計算</button>
+                <button class="btn-calc" onclick="showStayInfo('<?= h($checkin->user_name) ?>', '<?= h($checkin->check_in_at) ?>', '<?= h($discountMsg) ?>')">料金計算</button>
             </td>
         </tr>
         <?php endforeach; ?>
@@ -100,7 +117,7 @@
   </div>
 </div>
 <script>
-function showStayInfo(userName, checkinAt) {
+function showStayInfo(userName, checkinAt, discountMsg = '') {
     // checkinAt: "YYYY-MM-DD HH:MM:SS" (UTC)
     // UTC文字列をDateとして解釈
     const checkinDateUtc = new Date(checkinAt.replace(/-/g, '/'));
@@ -141,7 +158,12 @@ function showStayInfo(userName, checkinAt) {
       price = 2970;
       maxStr = '<br><span style="color:red;font-size:0.95em;">※最大料金</span>';
     }
+    // 割引額の表記をここに
+    let discountHtml = '';
+    if (discountMsg) {
+      discountHtml = `<br><span style=\"color:#2a7ae2;font-size:0.95em;\">${discountMsg}</span>`;
+    }
     document.getElementById('stayInfoContent').innerHTML =
-        `<b>${userName}</b><br>滞在時間: <b>${stayStr}</b></br>料金: <b>￥${price.toLocaleString()}</b>${maxStr}`;
+        `<b>${userName}</b><br>滞在時間: <b>${stayStr}</b></br>基本料金: <b>￥${price.toLocaleString()}</b>${maxStr}${discountHtml}`;
 }
 </script>
