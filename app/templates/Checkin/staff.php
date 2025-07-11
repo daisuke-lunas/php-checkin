@@ -2,11 +2,29 @@
     <h2>スタッフ出退勤</h2>
     <div>
       <h4>今月の出勤記録</h4>
-      <? // ここに、今月のチェックイン日付と時刻、
-       ?>
+      <?php if (!empty($checkinRecords)): ?>
+        <div>
+            <?php foreach ($checkinRecords as $rec): ?>
+            <?php
+              $dt = new DateTime($rec->check_in_at, new DateTimeZone('UTC'));
+              $dt->setTimezone(new DateTimeZone('Asia/Tokyo'));
+            ?>
+            <div style="border:1px solid #ccc; border-radius:6px; padding:10px 14px; margin-bottom:10px; max-width:320px; margin-left:auto; margin-right:auto; background:#fafbfc;">
+              <div style="font-weight:bold; color:#2a7ae2;">
+              <?= h($dt->format('Y-m-d')) ?> <?= h(strtoupper($rec->type)) ?>
+              </div>
+              <div style="color:#333; margin-top:4px;">
+              <?= h($dt->format('H:i')) ?>
+              </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+      <?php else: ?>
+        <div style="color:#888;">今月の記録はありません</div>
+      <?php endif; ?>
     </div>
     <form id="checkoutForm" method="post" onsubmit="return doCheckout(event);">
-        <button type="submit" style="font-size:1.3em;">退勤</button>
+        <button type="submit" style="font-size:1.3em; margin-top:8px">退勤</button>
     </form>
     <div id="checkoutResult" style="margin-top:1.5em; font-size:1.1em; color:#2a7ae2;"></div>
     <script>

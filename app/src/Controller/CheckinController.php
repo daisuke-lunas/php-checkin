@@ -19,19 +19,38 @@ class CheckinController extends AppController
       }
 
       if ($user) {
+          $id_token = $session->read('IdToken');
+          $http = new Client();
+          $this->set('showLogout', true);
+
+          $response = $http->post('https://'.env('MY_DOMAIN').'/saveCheckin', [
+              'id_token' => $id_token
+          ]);
           // user_type=="staff"ならstaff専用テンプレートを表示
           if (isset($user['user_type']) && $user['user_type'] === 'staff') {
-              $this->set('showLogout', true);
+              // 今月のin/out一覧を取得
+              $checkinsTable = $this->getTableLocator()->get('Checkins');
+              $userId = $user['ext_id'] ?? null;
+              $month = date('Y-m');
+              $records = [];
+              if ($userId) {
+                  $usersTable = $this->getTableLocator()->get('Users');
+                  $userEntity = $usersTable->find()->where(['ext_id' => $userId])->first();
+                  if ($userEntity) {
+                      $records = $checkinsTable->find()
+                          ->where([
+                              'user_id' => $userEntity->id,
+                              'DATE_FORMAT(check_in_at, "%Y-%m") =' => $month
+                          ])
+                          ->order(['check_in_at' => 'ASC'])
+                          ->all();
+                  }
+              }
+              $this->set('checkinRecords', $records);
               $this->render('staff');
               return;
           }
           // ...既存の一般ユーザー処理...
-          $this->set('showLogout', true);
-          $id_token = $session->read('IdToken');
-          $http = new Client();
-          $response = $http->post('https://'.env('MY_DOMAIN').'/saveCheckin', [
-              'id_token' => $id_token
-          ]);
           $body = $response->getJson();
           if ($response->isOk() && isset($body['userName'])) {
               $this->set('message', "{$body['userName']}さん、いらっしゃいませ");

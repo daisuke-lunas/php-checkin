@@ -120,6 +120,7 @@ class ApiController extends AppController
             ->find()
             ->where([
           'user_id' => $user->id,
+          'type' => 'in',
           'DATE(check_in_at) =' => $today
             ])
             ->first();
