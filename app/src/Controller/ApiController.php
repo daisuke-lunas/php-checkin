@@ -78,9 +78,13 @@ class ApiController extends AppController
         }
 
         // セッション保存
+        // user_typeをDBから取得してセッションに保存
+        $userEntity = $usersTable->find()->where(['ext_id' => $userId])->first();
+        $userType = $userEntity && !empty($userEntity->user_type) ? $userEntity->user_type : null;
         $this->getRequest()->getSession()->write('User', [
             'ext_id' => $userId,
-            'username' => $userName
+            'username' => $userName,
+            'user_type' => $userType,
         ]);
 
         return $this->redirect('/checkin');
@@ -159,6 +163,64 @@ class ApiController extends AppController
             'userName' => $user->display_name,
             'monthlyCount' => $monthlyCount
         ]));
+    }
+
+    public function checkout()
+    {
+      $this->request->allowMethod(['post']);
+      // staff.phpのfetchはCSRFトークンのみ、id_token等は送らない
+      $session = $this->getRequest()->getSession();
+      $user = $session->read('User');
+      if (!$user || empty($user['ext_id'])) {
+        return $this->response->withType('application/json')->withStringBody(json_encode([
+          'error' => '認証情報がありません'
+        ]));
+      }
+
+      $usersTable = $this->getTableLocator()->get('Users');
+      $userEntity = $usersTable->find()->where(['ext_id' => $user['ext_id']])->first();
+      if (!$userEntity) {
+        return $this->response->withType('application/json')->withStringBody(json_encode([
+          'error' => 'ユーザーが見つかりません'
+        ]));
+      }
+
+      // 今日すでに退勤済みか確認
+      $today = date('Y-m-d');
+      $existingCheckout = $this->getTableLocator()->get('Checkins')
+        ->find()
+        ->where([
+          'user_id' => $userEntity->id,
+          'DATE(check_in_at) =' => $today,
+          'type' => 'out',
+        ])
+        ->first();
+      if ($existingCheckout) {
+        return $this->response->withType('application/json')->withStringBody(json_encode([
+          'error' => '本日すでに退勤済みです'
+        ]));
+      }
+
+      // 退勤登録
+      $checkinsTable = $this->getTableLocator()->get('Checkins');
+      $checkin = $checkinsTable->newEntity([
+        'user_id' => $userEntity->id,
+        'user_ext_id' => $userEntity->ext_id,
+        'user_name' => $userEntity->display_name,
+        'type' => 'out',
+        'check_in_at' => date('Y-m-d H:i:s')
+      ]);
+      if (!$checkinsTable->save($checkin)) {
+        $errors = $checkin->getErrors();
+        return $this->response->withType('application/json')->withStringBody(json_encode([
+          'error' => '退勤の保存に失敗しました',
+          'details' => $errors
+        ]));
+      }
+
+      return $this->response->withType('application/json')->withStringBody(json_encode([
+        'success' => true
+      ]));
     }
 
     public function beforeFilter(\Cake\Event\EventInterface $event)

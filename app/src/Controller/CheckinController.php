@@ -19,8 +19,14 @@ class CheckinController extends AppController
       }
 
       if ($user) {
+          // user_type=="staff"ならstaff専用テンプレートを表示
+          if (isset($user['user_type']) && $user['user_type'] === 'staff') {
+              $this->set('showLogout', true);
+              $this->render('staff');
+              return;
+          }
+          // ...既存の一般ユーザー処理...
           $this->set('showLogout', true);
-          // 認証済 → saveCheckin へ送信
           $id_token = $session->read('IdToken');
           $http = new Client();
           $response = $http->post('https://'.env('MY_DOMAIN').'/saveCheckin', [
