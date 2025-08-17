@@ -102,6 +102,14 @@ class CheckinController extends AppController
           $session->write('OAuthState', $state);
           $lineLoginUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={$lineClientId}&redirect_uri={$redirectUri}&state={$state}&scope=openid%20profile";
           $this->set('loginUrl', $lineLoginUrl);
+
+          // Googleログインボタン表示
+          $googleClientId = env('GOOGLE_CLIENT_ID');
+          $googleRedirectUri = urlencode('https://' . env('MY_DOMAIN') . '/api/googleAuthorize');
+          $googleState = bin2hex(random_bytes(16));
+          $session->write('GoogleOAuthState', $googleState);
+          $googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={$googleClientId}&redirect_uri={$googleRedirectUri}&state={$googleState}&scope=openid%20email%20profile";
+          $this->set('googleLoginUrl', $googleLoginUrl);
       }
   }
 

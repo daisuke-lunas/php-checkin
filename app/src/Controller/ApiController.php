@@ -90,6 +90,81 @@ class ApiController extends AppController
         return $this->redirect('/checkin');
     }
 
+    // Googleコールバック
+    public function googleAuthorize()
+    {
+      $code = $this->request->getQuery('code');
+      $state = $this->request->getQuery('state');
+      $sessionState = $this->request->getSession()->read('GoogleOAuthState');
+
+      if ($state !== $sessionState) {
+        return $this->redirect('/checkin?error=1');
+      }
+
+      // Google認証APIでトークン取得
+      $client = new \Google\Client();
+      $client->setAuthConfig(ROOT . '/config/client_secret.json');
+      $client->setRedirectUri('https://' . env('MY_DOMAIN') . '/google-authorize');
+      $client->addScope('openid email profile');
+
+      try {
+        $token = $client->fetchAccessTokenWithAuthCode($code);
+      } catch (\Exception $e) {
+        $this->log('Google token fetch error: ' . $e->getMessage(), LogLevel::ERROR);
+        return $this->redirect('/checkin?error=1');
+      }
+
+      if (isset($token['error'])) {
+        $this->log('Google token response error: ' . json_encode($token), LogLevel::ERROR);
+        return $this->redirect('/checkin?error=1');
+      }
+
+      $idToken = $token['id_token'] ?? null;
+      if (!$idToken) {
+        $this->log('Google idToken is null', LogLevel::INFO);
+        return $this->redirect('/checkin');
+      }
+
+      // IDトークンをセッションへ保存
+      $this->getRequest()->getSession()->write('IdToken', $idToken);
+
+      // ユーザー情報取得
+      $jwt = explode(".", $idToken)[1];
+      $payload = json_decode(base64_decode(strtr($jwt, '-_', '+/')), true);
+      $userId = $payload['sub'] ?? null;
+      $userName = $payload['name'] ?? ($payload['email'] ?? '');
+
+      if (!$userId) {
+        $this->log('Google userId is null', LogLevel::ERROR);
+        return $this->redirect('/checkin?error=1');
+      }
+
+      // DBにユーザー登録
+      $usersTable = $this->getTableLocator()->get('Users');
+      if (!$usersTable->exists(['ext_id' => $userId])) {
+        $user = $usersTable->newEntity([
+          'ext_type' => "GOOGLE",
+          'ext_id' => $userId,
+          'username' => $userName,
+          'display_name' => $userName
+        ]);
+        $usersTable->save($user);
+      }
+
+      // セッション保存
+      $userEntity = $usersTable->find()->where(['ext_id' => $userId])->first();
+      $userType = $userEntity && !empty($userEntity->user_type) ? $userEntity->user_type : null;
+      $this->getRequest()->getSession()->write('User', [
+        'ext_id' => $userId,
+        'username' => $userName,
+        'user_type' => $userType,
+      ]);
+
+      return $this->redirect('/checkin');
+    }
+
+    
+
     public function saveCheckin()
     {
         $this->request->allowMethod(['post']);

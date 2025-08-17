@@ -4,6 +4,8 @@
 /config/.env
 /config/.env.prod
 /config/.env.dev
+#Google API
+/config/client_secret.json
 /logs/*
 /tmp/*
 /vendor/*

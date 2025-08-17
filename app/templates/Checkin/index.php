@@ -98,7 +98,14 @@ img {
         <a href="<?= h($loginUrl) ?>" class="btn">
             <?= $this->Html->image('btn_login_base.png', ['alt' => 'LINEでログイン']) ?>
         </a>
-    <div>毎月のチェックイン回数に応じて、割引が適用されます（仮）</div>
+    <?php if (!empty($googleLoginUrl)): ?>
+        ↓工事中
+        <a href="<?= h($googleLoginUrl) ?>" class="btn" style="font-size:1.2em; border-radius:6px; text-decoration:none;">
+          <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" 
+            alt="Sign in with Google" />
+        </a>
+    <?php endif; ?>
+    <div>毎月のチェックイン回数に応じて、割引が適用されます</div>
     <?php else: ?>
         <h2><?= h($message) ?></h2>
         <h4><?= h($monthlyCountMessage) ?></h4>
