@@ -15,7 +15,8 @@ SELECT
   COUNT(*) AS total_count
 FROM checkins c
 JOIN users u ON c.user_id = u.id
-WHERE DATE_FORMAT(c.check_in_at, '%Y%m') = '202506'  -- ← 対象年月を指定
+WHERE DATE_FORMAT(c.check_in_at, '%Y%m') = '202507'  -- ← 対象年月を指定
+AND c.type = 'in'
 GROUP BY
   yyyymm,
   c.user_id,

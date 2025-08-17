@@ -11,4 +11,5 @@ WHERE
     users.user_type = 'staff' 
     AND DATE_FORMAT(checkins.check_in_at, '%Y%m') = '202507'  -- 対象年月を指定
 ORDER BY 
-    checkins.check_in_at DESC;
+    users.id,
+    checkins.check_in_at;
