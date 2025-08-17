@@ -80,6 +80,7 @@ return function (RouteBuilder $routes): void {
 
     $routes->connect('/checkin', ['controller' => 'Checkin', 'action' => 'index']);
     $routes->connect('/authorize', ['controller' => 'Api', 'action' => 'authorize']);
+    $routes->connect('/googleAuthorize', ['controller' => 'Api', 'action' => 'googleAuthorize']);
     $routes->connect('/saveCheckin', ['controller' => 'Api', 'action' => 'saveCheckin', '_method' => 'POST']);
     $routes->connect('/logout', ['controller' => 'Checkin', 'action' => 'logout', '_method' => 'POST']);
     $routes->connect('/checkin-list', ['controller' => 'CheckinList', 'action' => 'index']);

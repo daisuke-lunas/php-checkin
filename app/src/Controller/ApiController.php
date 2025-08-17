@@ -4,6 +4,7 @@ namespace App\Controller;
 use Cake\Controller\Controller;
 use Cake\Http\Client;
 use Psr\Log\LogLevel;
+use Google\Client as GoogleClient;
 
 class ApiController extends AppController
 {
@@ -15,13 +16,14 @@ class ApiController extends AppController
         $sessionState = $this->request->getSession()->read('OAuthState');
 
         if ($state !== $sessionState) {
+            $this->log('LINE: session is different: '. $state . " ? " . $sessionState, LogLevel::ERROR);
             return $this->redirect('/checkin?error=1');
         }
 
         // エラー判定
         $errorCode = $this->request->getQuery('error');
         if($errorCode) {
-            return $this->redirect('/checkin?error=1');
+            return $this->redirect('/checkin?error='.$errorCode);
         }
 
         // トークン取得
@@ -98,14 +100,22 @@ class ApiController extends AppController
       $sessionState = $this->request->getSession()->read('GoogleOAuthState');
 
       if ($state !== $sessionState) {
+        $this->log('Google session is different: '. $state . " ? " . $sessionState, LogLevel::ERROR);
         return $this->redirect('/checkin?error=1');
       }
+      $this->log('Google API accessed', LogLevel::INFO);
 
+      // エラー判定
+      $errorCode = $this->request->getQuery('error');
+      if ($errorCode) {
+        $this->log('Google returns error: '.$errorCode, LogLevel::ERROR);
+        return $this->redirect(`/checkin?error={$errorCode}`);
+      }
       // Google認証APIでトークン取得
-      $client = new \Google\Client();
+      $client = new GoogleClient();
       $client->setAuthConfig(ROOT . '/config/client_secret.json');
-      $client->setRedirectUri('https://' . env('MY_DOMAIN') . '/google-authorize');
-      $client->addScope('openid email profile');
+      $client->setRedirectUri('https://' . env('MY_DOMAIN') . '/googleAuthorize');
+      $client->addScope('openid profile');
 
       try {
         $token = $client->fetchAccessTokenWithAuthCode($code);

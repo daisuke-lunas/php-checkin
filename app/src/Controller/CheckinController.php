@@ -105,10 +105,10 @@ class CheckinController extends AppController
 
           // Googleログインボタン表示
           $googleClientId = env('GOOGLE_CLIENT_ID');
-          $googleRedirectUri = urlencode('https://' . env('MY_DOMAIN') . '/api/googleAuthorize');
+          $googleRedirectUri = urlencode('https://' . env('MY_DOMAIN') . '/googleAuthorize');
           $googleState = bin2hex(random_bytes(16));
           $session->write('GoogleOAuthState', $googleState);
-          $googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={$googleClientId}&redirect_uri={$googleRedirectUri}&state={$googleState}&scope=openid%20email%20profile";
+          $googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={$googleClientId}&redirect_uri={$googleRedirectUri}&state={$googleState}&scope=openid%20profile";
           $this->set('googleLoginUrl', $googleLoginUrl);
       }
   }
